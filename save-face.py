@@ -2,6 +2,9 @@ import cv2
 import face_recognition
 import numpy as np
 
+MAX_ERROR_FRAMES_ACCEPTED = 10
+
+
 while True:
     name = input("Please type the person's name: ").strip()
     if name == "":
@@ -31,16 +34,20 @@ print("Press Q to quit.")
 # --------------------------------
 # Camera loop
 # --------------------------------
-
+counter_frame_error = 0
 while True:
 
     ret, frame = cap.read()
 
     if not ret:
-        print("Error: Failed to grab frame.")
-        break
+        counter_frame_error = counter_frame_error + 1
+        if counter_frame_error >= MAX_ERROR_FRAMES_ACCEPTED:
+            print("Error: Failed to grab frames.")
+            break
+        continue
 
     # Show camera
+    counter_frame_error = 0
     cv2.imshow("Laptop Camera", frame)
 
     # Get keyboard input

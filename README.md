@@ -1,16 +1,44 @@
 # Alzheimers Glasses
+Alex Conesa Dabizha
+
+## System Functionality
+
+### run.py
+
+### capturePerson.py
 
 
-## USING findface.py and findface2.py
+## System configuration and execution
 
-First and second programs, only works for my sister and me, so I had to change the whole program, so it could be used by ANYONE.
-## How to save a face
+### How to install
 
-Execute script save-'name'face.py, this will first open the camera, then press 'S' to save the face infront of the camera (cannot have more than one face in camera fov). This will save the faces 128-d number into .npy file.
+```shell
+pip install -r requirements.txt
+```
 
-## How to find face
-Execute script findface.py (you need to atleats do one face saving before doing this or all faces will be unknown). CANNOT HAVE MORE THAN ONE FACE ON CAMERA AT THE SAME TIME
+### How to capture faces
 
-## USING findface3.py
-Third program, can be caled up...
+Execute the command:
+
+```shell
+# It will ask for the name
+python3 capturePerson.py
+```
+
+Variants (replace `alex` by the name of the person you want to save):
+
+```shell
+python3 capturePerson.py --name alex --no-voice --no-face
+```
+
+The faces captured will automatically be stored in the `faces` folder.
+The voices generated will automatically be stored in `voices` foler.
+
+### How to execute face recognition
+
+```shell
+python3 run.py
+```
+
+Point/look with the camera at the person wanted to be recognized.
 

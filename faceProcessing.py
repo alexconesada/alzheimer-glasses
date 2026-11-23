@@ -4,60 +4,27 @@ import face_recognition
 import numpy as np
 import sys
 import traceback
-
-camera_device = None
-MAX_ERROR_FRAMES_ACCEPTED = 10
-KEY_S = 115
-KEY_Q = 113
+import constants
+import camera_lib
 
 def capture_face(person_name, output_path) -> bool:
     print(f"Starting capture face of {person_name}")
-    if not enable_camera():
+    camera_device = camera_lib.enable_camera()
+    if camera_device is None:
         return False
 
     print("  Press S to save capture.")
     print("  Press Q to quit.")
 
     try:
-        return show_camera_and_capture_face(person_name, output_path)
+        return show_camera_and_capture_face(camera_device, person_name, output_path)
     except Exception as e:
         print(f"Error capturing face: {e}", file=sys.stderr)
         traceback.print_exc()
         return False
     finally:
-        disable_camera()
+        camera_lib.disable_camera(camera_device)
 
-# --------------------------------
-# Open webcam
-# --------------------------------
-def enable_camera() -> bool:
-    global camera_device
-
-    try:
-        camera_device = cv2.VideoCapture(0)
-
-        if not camera_device.isOpened():
-            print("Error: Could not open webcam.", file=sys.stderr)
-            return False
-
-        print("Camera opened successfully!")
-        return True
-
-    except Exception as e:
-        print(f"Error enablikng camera: {e}", file=sys.stderr)
-        return False
-
-
-# --------------------------------
-# Clean up
-# --------------------------------
-def disable_camera():
-    global camera_device
-    try:
-        camera_device.release()
-        cv2.destroyAllWindows()
-    except:
-        pass
 
 # --------------------------------
 # Capture camera frames until 
@@ -65,7 +32,7 @@ def disable_camera():
 # 'Ss' save the current frame
 # 'Qq' exit
 # --------------------------------
-def show_camera_and_capture_face(person_name, output_path):
+def show_camera_and_capture_face(camera_device, person_name, output_path):
     counter_frame_error = 0
 
     while True:
@@ -73,7 +40,7 @@ def show_camera_and_capture_face(person_name, output_path):
 
         if not ret:
             counter_frame_error = counter_frame_error + 1
-            if counter_frame_error >= MAX_ERROR_FRAMES_ACCEPTED:
+            if counter_frame_error >= constants.MAX_ERROR_FRAMES_ACCEPTED:
                 print("Error: Failed to grab frames.", file=sys.stderr)
                 break
 
@@ -88,7 +55,7 @@ def show_camera_and_capture_face(person_name, output_path):
         # Get keyboard input
         key = (cv2.waitKey(1) & 0xFF)
 
-        if key == KEY_S:
+        if key == constants.KEY_S:
             face = get_face_from_frame(frame)
             if not face is None:
                 np.save(f"{output_path}/{person_name}.npy", face)
@@ -97,7 +64,7 @@ def show_camera_and_capture_face(person_name, output_path):
                 print("128 numbers are stored")
                 return True
 
-        elif key == KEY_Q:
+        elif key == constants.KEY_Q:
             break
 
     # End while
@@ -131,4 +98,3 @@ def get_face_from_frame(frame):
         )
 
         return face_encodings[0]
-        

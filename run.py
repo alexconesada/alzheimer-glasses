@@ -2,9 +2,17 @@ import cv2
 import face_recognition
 import numpy as np
 import time
-import pygame
+#import pygame
 import os
+import subprocess
 import constants
+import camera_lib
+
+def log(text):
+    #print(text)
+    pass
+
+show_preview = False
 
 # --------------------------------
 # Load ALL saved faces
@@ -25,44 +33,41 @@ for filename in os.listdir(constants.FACES):
         known_faces.append(face)
         known_names.append(name)
 
-        print(f"Loaded face: {name}")
+        log(f"Loaded face: {name}")
 
 
 if len(known_faces) == 0:
     print("ERROR: No faces found in the faces folder.")
     exit()
 
-print(f"\nLoaded {len(known_faces)} people.")
-print("People:", ", ".join(known_names))
+log(f"\nLoaded {len(known_faces)} people.")
+log("People:", ", ".join(known_names))
 
 # --------------------------------
 # Open webcam
 # --------------------------------
-cap = cv2.VideoCapture(0)
-
-if not cap.isOpened():
-    print("Error: Could not open webcam.")
+camera_device = camera_lib.enable_camera()
+if camera_device is None:
     exit()
 
-print("\nCamera opened successfully!")
-print("Looking for known people...")
-print("Press Q to quit.")
+log("Looking for known people...")
+if show_preview: print("Press Q to quit.")
 
 # ---------------------------------------
 # Initialize pygame ONCE (To play voices)
 # ---------------------------------------
-pygame.mixer.init()
+#pygame.mixer.init()
 
-# --------------------------------
+# ----------------------------------
 # Remember the last person announced
-# --------------------------------
+# ----------------------------------
 last_name = None
 
 # --------------------------------
 # Camera loop
 # --------------------------------
 while True:
-    ret, frame = cap.read()
+    ret, frame = camera_device.read()
 
     if not ret:
         print("Error: Failed to grab frame.")
@@ -110,9 +115,7 @@ while True:
         # --------------------------------
         # Announce ONLY when person changes
         # --------------------------------
-        if name != "Unknown" and name != last_name:
-            print(f"Detected: {name}")
-
+        if name != "Unknown" and (name != last_name):
             # Voice filename
             voice_file = os.path.join(constants.VOICES, f"{name.lower()}.wav")
 
@@ -120,15 +123,16 @@ while True:
             # Play person's voice
             # --------------------------------
             if os.path.exists(voice_file):
-                pygame.mixer.music.load(voice_file)
-                pygame.mixer.music.play()
-
-                while pygame.mixer.music.get_busy():
-                    time.sleep(0.1)
+                #pygame.mixer.music.load(voice_file)
+                #pygame.mixer.music.play()
+                #while pygame.mixer.music.get_busy():
+                #    time.sleep(0.1)
+                subprocess.run(
+                    ["aplay", "-q", voice_file]
+                )
 
             else:
                 print(f"No voice file found for {name}: {voice_file}")
-
 
             # Remember who was announced
             last_name = name
@@ -137,20 +141,18 @@ while True:
     # --------------------------------
     # Show camera
     # --------------------------------
-    #cv2.imshow("Face Recognition", frame)
+    if show_preview:
+        cv2.imshow("Face Recognition", frame)
 
-    # --------------------------------
-    # Q = quit
-    # --------------------------------
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+        # --------------------------------
+        # Q = quit
+        # --------------------------------
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
 
 # --------------------------------
 # Clean up
 # --------------------------------
-cap.release()
-cv2.destroyAllWindows()
-pygame.quit()
-
-print("\nCamera closed.")
+camera_lib.disable_camera(camera_device)
+#pygame.quit()

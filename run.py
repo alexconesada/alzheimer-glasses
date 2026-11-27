@@ -41,7 +41,7 @@ if len(known_faces) == 0:
     exit()
 
 log(f"\nLoaded {len(known_faces)} people.")
-log("People:", ", ".join(known_names))
+log("People: ".join(known_names))
 
 # --------------------------------
 # Open webcam

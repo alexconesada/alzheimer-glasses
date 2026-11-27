@@ -38,7 +38,7 @@ The voices generated will automatically be stored in `voices` foler.
 
 ```shell
 python3 run.py
-```
+p```
 
 Point/look with the camera at the person wanted to be recognized.
 

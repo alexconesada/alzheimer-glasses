@@ -73,7 +73,7 @@ def recognize_faces(frame, known_faces, known_names):
 # --------------------------------
 # Announce recognized person
 # --------------------------------
-def announce_person(name):
+def announce(name):
     voice_file = os.path.join(
         constants.VOICES,
         f"{name.lower()}.wav"
@@ -126,7 +126,7 @@ def process_camera(
             if name == "Unknown" or name == last_name:
                 continue
 
-            announce_person(name)
+            announce(name)
             last_name = name
 
         if show_preview and not pi:
@@ -158,6 +158,8 @@ def run(pi=False, show_preview=False):
         if show_preview:
             print("Press Q to quit.")
 
+        announce("ready")
+
         process_camera(
             camera_device,
             known_faces,
@@ -172,6 +174,7 @@ def run(pi=False, show_preview=False):
     finally:
         camera_lib.disable_camera(camera_device, pi)
 
+    announce("power off")
     return 0
 
 

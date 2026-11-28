@@ -134,3 +134,10 @@ They could also remove people or update their pictures without having to use Pyt
 I also need to make sure that only authorized people can access this information.
 
 My glasses are still a prototype and can make mistakes, but I think this idea could be useful for people who have problems remembering names and faces.
+
+## Extra
+
+Play a selected voice with commands
+```shell
+aplay voices/ready.wav
+```

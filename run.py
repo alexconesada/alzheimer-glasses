@@ -129,7 +129,7 @@ def process_camera(
             announce_person(name)
             last_name = name
 
-        if show_preview:
+        if show_preview and not pi:
             if not display_preview(frame):
                 break
 
@@ -147,7 +147,7 @@ def run(pi=False, show_preview=False):
     print(f"Loaded {len(known_faces)} people.")
     print(f"People: {', '.join(known_names)}")
 
-    camera_device = camera_lib.enable_camera(pi)
+    camera_device = camera_lib.enable_camera(pi, show_preview)
 
     if camera_device is None:
         return 1

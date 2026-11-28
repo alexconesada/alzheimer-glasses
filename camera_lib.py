@@ -2,12 +2,12 @@ import cv2
 import sys
 import time
 
-def enable_camera(pi=False):
+def enable_camera(pi=False, show_preview=False):
     camera_device = None
 
     try:
         if pi:
-            from picamera2 import Picamera2
+            from picamera2 import Picamera2, Preview
 
             camera_device = Picamera2()
 
@@ -21,6 +21,14 @@ def enable_camera(pi=False):
             )
 
             camera_device.configure(config)
+            if show_preview:
+                camera_device.start_preview(
+                    Preview.DRM,
+                    x=0,
+                    y=0,
+                    width=640,
+                    height=480
+                )
             camera_device.start()
 
             time.sleep(2)
@@ -61,6 +69,7 @@ def disable_camera(camera_device, pi=False):
             if pi:
                 try:
                     camera_device.stop()
+                    camera_device.stop_preview()
                 finally:
                     camera_device.close()
             else:
